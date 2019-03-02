@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.harrysoft.androidbluetoothserial.BluetoothManager;
@@ -31,6 +32,8 @@ public class CommunicateViewModel extends AndroidViewModel {
 
     // The messages feed that the activity sees
     private MutableLiveData<String> messagesData = new MutableLiveData<>();
+    // The recived msg feed that the activity sees
+    private MutableLiveData<String> messagesDataRecieved = new MutableLiveData<>();
     // The connection status that the activity sees
     private MutableLiveData<ConnectionStatus> connectionStatusData = new MutableLiveData<>();
     // The device name that the activity sees
@@ -140,8 +143,15 @@ public class CommunicateViewModel extends AndroidViewModel {
 
     // Adds a received message to the conversation
     private void onMessageReceived(String message) {
+                    Log.d("3dplotLiveData ","************************" +
+                    "**********************");
+            Log.d("3dplotmsgLiveData",message);
+            Log.d("3dplotLiveData ","************************" +
+                    "**********************");
+        messagesDataRecieved.postValue(message);
         messages.append(deviceName).append(": ").append(message).append('\n');
         messagesData.postValue(messages.toString());
+
     }
 
     // Adds a sent message to the conversation
@@ -161,6 +171,14 @@ public class CommunicateViewModel extends AndroidViewModel {
         }
     }
 
+    // clear messages
+    public void clearMessage(String message) {
+        // Check we have a connected device and the message is not empty, then send the message
+
+        messages=new StringBuilder();
+        messagesData.postValue(messages.toString());
+    }
+
     // Called when the activity finishes - clear up after ourselves.
     @Override
     protected void onCleared() {
@@ -177,6 +195,9 @@ public class CommunicateViewModel extends AndroidViewModel {
     public LiveData<String> getMessages() { return messagesData; }
 
     // Getter method for the activity to use.
+    public LiveData<String> getMessagesRecieved() { return messagesDataRecieved; }
+
+    // Getter method for the activity to use.
     public LiveData<ConnectionStatus> getConnectionStatus() { return connectionStatusData; }
 
     // Getter method for the activity to use.
@@ -185,8 +206,10 @@ public class CommunicateViewModel extends AndroidViewModel {
     // Getter method for the activity to use.
     public LiveData<String> getMessage() { return messageData; }
 
+
+
     // An enum that is passed to the activity to indicate the current connection status
-    enum ConnectionStatus {
+    public enum ConnectionStatus {
         DISCONNECTED,
         CONNECTING,
         CONNECTED

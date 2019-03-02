@@ -1,0 +1,189 @@
+<head>
+    <!-- Plotly.js -->
+    <script src="plotly.js"></script>
+</head>
+<body>
+<a id="mya"></a>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="myDiv" style="width:100%;height:100%"></div>
+<style>
+.modebar {
+display: none !important;
+}
+</style>
+
+<script>
+  this.rawData ="[]";
+  
+  function getSensorData(){
+    rawData = jsinterface.getSensorRawData();
+    data = JSON.parse(rawData);
+    var xarr = data['x'];
+    var yarr = data['y'];
+    var zarr = data['z'];
+    var dataResult = convertCartesianCordinatesToZHeightMatrixSimple(xarr,yarr,zarr);
+    console.log(dataResult);
+    console.log("\n");
+    console.log(Date());
+    
+    return dataResult;
+  }  
+
+function  convertCartesianCordinatesToZHeightMatrixSimple(xarr,yarr,zarr){
+  var dataResult = createMatrix(10,10);
+  for(i=0;i<zarr.length;i++){
+    dataResult[xarr[i]][yarr[i]]= zarr[i];
+  }
+  return dataResult;
+}
+
+/**
+* ref : https://community.plot.ly/t/set-x-y-z-on-surface-plot/6068/6 ;
+*/
+function convertCartesianCordinatesToZHeightMatrix(xarr,yarr,zarr){
+  var dataResult = new Array();
+  var matrix_size = zarr.length;
+  var dataResult = createMatrix(matrix_size,matrix_size);
+
+  var xmin = xarr.min();
+  var dx = xarr.max()-xmin;
+  var ymin = yarr.min();
+  var dy = yarr.max()-ymin;
+  var i = 0;
+  for(i=0;i<zarr.length;i++){
+    var xvalue = xarr[i];
+    var normalized_xvalue = (xvalue - xmin)/dx;
+    col = parseInt(Math.round(normalized_xvalue * (matrix_size - 1)));
+    yvalue = yarr[i];
+    normalized_yvalue = (yvalue-ymin)/dy;
+    row = parseInt(Math.round(normalized_yvalue * (matrix_size - 1)));
+    dataResult[row][col] = zarr[i];
+  }
+  return dataResult;
+}
+
+Array.prototype.max = function() {
+  return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+  return Math.min.apply(null, this);
+};
+
+function createMatrix(N, M) {
+  var matrix = new Array(N); // Array with initial size of N, not fixed!
+
+  for (var i = 0; i < N; ++i) {
+      matrix[i] = Array(M).fill().map(() => 0);
+  }
+  return matrix;
+}
+function getData() {
+  var arr = [];
+  var arrx =[];
+  var arry =[];
+  var arrz =[];
+  var arr3Combine = [];
+  for(let i=0;i<80;i++){
+  //    arr.push(Array(3).fill().map(() => Math.random()));
+  arr.push(Array(10).fill().map(() => 0))
+
+  //arrx.push(Math.random());
+  arrx.push(0);
+
+  //arry.push(Math.random());
+  arry.push(0);
+
+  //arrz.push(Math.random());
+  arrz.push(0);
+  }
+  arr3Combine['x']=arrx;
+  arr3Combine['y']=arry;
+  arr3Combine['z']=arrz;
+  return arr;
+}
+
+ var layout = {
+  title: 'New Sensor data',
+  autosize: false,
+  width: 320,
+  height: 320,
+  scene:{
+    aspectmode:'manual',
+		aspectratio: {x:1, y:1, z:1},
+    zaxis:{
+      title: {
+        text: 'zaxis',
+        font: {
+          family: 'Courier New, monospace',
+          size: 18,
+          color: '#7f7f7f'
+        }
+      },
+      autorange: false,
+      nticks:'9',
+      range: [0, 300],
+      type: 'linear'
+    },
+    xaxis:{
+      autorange: false,
+      nticks:'9',
+      range: [0, 10],
+      type: 'linear'
+    },
+    yaxis:{
+      autorange: false,
+      nticks:'9',
+      range: [0, 10],
+      type: 'linear'
+    },
+  },
+  margin: {
+    l: 30,
+    r: 30,
+    b: 30,
+    t: 30,
+  }
+ };
+
+ plotNewChart();
+ updateChartAfterDelay();
+
+function updateChartAfterDelay(){
+  setTimeout(function() {
+     updateChart();
+     }, 0.2);
+}
+
+function updateChart(){
+  var data = getSensorData();
+  var dataUpdate =  {"z": [data]};
+  var layoutUpdate =  layout;
+  // Plotly.update('myDiv', dataUpdate ,layout);
+  Plotly.restyle('myDiv', dataUpdate );
+  // Plotly.extendTraces('myDiv',  {"z": [data]} , [0]);
+  updateChartAfterDelay();
+}
+
+function plotNewChart(){
+  var data = getData();
+  Plotly.newPlot('myDiv', [{ //multiple traces
+      z: data,
+      colorscale: [
+        [0, 'rgb(0,68,27)'],
+        [0.33, 'rgb(0,109,44)'],
+        [0.5, 'rgb(255,255,102)'],
+        [0.75, 'rgb(255,0,0)'], 
+        [1, 'rgb(255,0,0)']
+    ],
+      showscale :false,
+      lighting: {ambient: 0.9},
+      type: 'surface',
+      autocolorscale: false,
+      zmin:0,
+      zmax:60
+  }],layout, {showSendToCloud: true});
+}
+
+</script>
+</body>

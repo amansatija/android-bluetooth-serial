@@ -11,17 +11,17 @@ import android.widget.TextView;
 
 public class CommunicateActivity extends AppCompatActivity {
 
-    private TextView connectionText, messagesView;
-    private EditText messageBox;
-    private Button sendButton, connectButton;
+    protected TextView connectionText, messagesView;
+    protected EditText messageBox;
+    protected Button sendButton, connectButton;
 
-    private CommunicateViewModel viewModel;
+    protected CommunicateViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Setup our activity
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_communicate);
+        setContentViewWrapper();
         // Enable the back button in the action bar if possible
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -47,10 +47,8 @@ public class CommunicateActivity extends AppCompatActivity {
         viewModel.getConnectionStatus().observe(this, this::onConnectionStatus);
         viewModel.getDeviceName().observe(this, name -> setTitle(getString(R.string.device_name_format, name)));
         viewModel.getMessages().observe(this, message -> {
-            if (TextUtils.isEmpty(message)) {
-                message = getString(R.string.no_messages);
-            }
-            messagesView.setText(message);
+            doOnMsgRecieved(message);
+
         });
         viewModel.getMessage().observe(this, message -> {
             // Only update the message if the ViewModel is trying to reset it
@@ -63,8 +61,19 @@ public class CommunicateActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> viewModel.sendMessage(messageBox.getText().toString()));
     }
 
+    public void doOnMsgRecieved(String message) {
+        if (TextUtils.isEmpty(message)) {
+            message = getString(R.string.no_messages);
+        }
+        messagesView.setText(message);
+    }
+
+    protected void setContentViewWrapper() {
+        setContentView(R.layout.activity_communicate);
+    }
+
     // Called when the ViewModel updates us of our connectivity status
-    private void onConnectionStatus(CommunicateViewModel.ConnectionStatus connectionStatus) {
+    public void onConnectionStatus(CommunicateViewModel.ConnectionStatus connectionStatus) {
         switch (connectionStatus) {
             case CONNECTED:
                 connectionText.setText(R.string.status_connected);

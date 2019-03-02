@@ -1,0 +1,149 @@
+<head>
+    <!-- Plotly.js -->
+    <script src="plotly.js"></script>
+</head>
+<body>
+<a id="mya"></a>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="myDiv" style="width:100%;height:100%"></div>
+
+
+<script>
+    /* JAVASCRIPT CODE GOES HERE */
+
+//     this.anim = "true";
+//     var that = this; // you store the reference to a `this` in `that` variable,
+                    // so you could use it in a callback function. You have
+                    // to do that because it has its own `this` defined
+//
+//
+//
+    // this.anim = jsinterface.testNativeMethod();
+    // console.log(that.anim);
+    // setTimeout(function() {
+    //  callFunc();
+    //  }, 5000);
+//
+    //  function callFunc() {
+    //     that.anim = jsinterface.testNativeMethod();
+    //     console.log(that.anim);         // Function returns the product of a and b
+    //  }
+    </script>
+<script>
+
+  this.rawData ="[]";
+  
+  function getSensorData(){
+      rawData = jsinterface.getSensorRawData();
+      data = JSON.parse(rawData);
+      data['intensity']= 'intensity';
+      data['colorscale']=[
+      [0, 'rgb(255, 0, 255)'],
+      [20, 'rgb(0, 255, 0)'],
+      [50, 'rgb(0, 0, 255)'],
+      [100, 'rgb(0, 255, 255)']
+    ]
+      return data;
+  }  
+
+  function getData() {
+       var arr = [];
+       var arrx =[];
+       var arry =[];
+       var arrz =[];
+       var arr3Combine = [];
+       for(let i=0;i<80;i++){
+        //    arr.push(Array(3).fill().map(() => Math.random()));
+        arr.push(Array(3).fill().map(() => 0))
+
+        //arrx.push(Math.random());
+        arrx.push(0);
+
+        //arry.push(Math.random());
+        arry.push(0);
+
+        //arrz.push(Math.random());
+        arrz.push(0);
+       }
+       arr3Combine['x']=arrx;
+       arr3Combine['y']=arry;
+       arr3Combine['z']=arrz;
+       return arr3Combine;
+}
+
+ var layout = {
+ title: 'New Sensor data',
+ autosize: true,
+ width: 300,
+ height: 300,
+ scene:{
+    aspectmode: "manual",
+   aspectratio: {
+     x: 1, y: 2, z: 1,
+    },
+    zaxis:{
+    title: {
+       text: 'zaxis',
+       font: {
+        family: 'Courier New, monospace',
+        size: 18,
+        color: '#7f7f7f'
+      }
+    },
+
+    autorange: false,
+    range: [0, 200],
+    type: 'linear'
+    },
+    
+ },
+ margin: {
+ l: 30,
+ r: 30,
+ b: 30,
+ t: 90,
+ }
+ };
+
+ plotNewChart();
+ updateChartAfterDelay();
+
+function updateChartAfterDelay(){
+  setTimeout(function() {
+     updateChart();
+     }, 50);
+}
+
+function updateChart(){
+  var data = getSensorData();
+    // Plotly.react('myDiv', [{ //multiple traces
+    //     x: data[x],
+    //     y: data[y],
+    //     z: data[z],
+    //     type: 'surface'
+    // }],layout, {showSendToCloud: true});
+    Plotly.react('myDiv', [{ //multiple traces
+        x: data['x'],
+        y: data['y'],
+        z: data['z'],
+        type: 'mesh3d'
+    }],layout, {showSendToCloud: true});
+
+  updateChartAfterDelay();
+}
+
+function plotNewChart(){
+var data = getData();
+Plotly.newPlot('myDiv', [{ //multiple traces
+    x: data['x'],
+    y: data['y'],
+    z: data['z'],
+     type: 'mesh3d'
+}],layout, {showSendToCloud: true});
+}
+
+
+
+
+</script>
+</body>

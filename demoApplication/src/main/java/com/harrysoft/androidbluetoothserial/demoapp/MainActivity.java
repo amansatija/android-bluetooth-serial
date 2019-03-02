@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.harrysoft.androidbluetoothserial.demoapp.threedplot.ActivityThreeDPlot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Called when clicking on a device entry to start the CommunicateActivity
     public void openCommunicationsActivity(String deviceName, String macAddress) {
-        Intent intent = new Intent(this, CommunicateActivity.class);
+        Intent intent = new Intent(this, ActivityThreeDPlot.class);
         intent.putExtra("device_name", deviceName);
         intent.putExtra("device_mac", macAddress);
         startActivity(intent);

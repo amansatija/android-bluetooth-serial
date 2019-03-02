@@ -43,6 +43,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 // Bluetooth unavailable on this device :( tell the user
                 Toast.makeText(getApplication(), R.string.no_bluetooth, Toast.LENGTH_LONG).show();
                 // Tell the activity there was an error and to close
+
                 return false;
             }
         }
